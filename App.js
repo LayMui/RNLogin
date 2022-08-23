@@ -9,6 +9,13 @@ import Login from './src/pages/Login'
 import Signup from './src/pages/Signup'
 import Home from './src/pages/Home'
 
+
+import AzureAuth from 'react-native-azure-auth';
+
+const azureAuth = new AzureAuth({
+    clientId: '13892435-4df6-43a4-b6e9-922b6dbc3098'
+});
+
 const Stack = createStackNavigator();
 
 
