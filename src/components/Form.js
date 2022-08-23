@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View , StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import Home from '../pages/Home';
 
-import { testProperties } from '../utility/helper';
-
+import testProperties from '../utility/helper'
 export default class Form extends Component<{}> {
   render() {
     const { navigate } = this.props.navigation;
