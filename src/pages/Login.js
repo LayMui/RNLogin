@@ -3,7 +3,7 @@ import { Text, View , StyleSheet , TextInput, TouchableOpacity} from 'react-nati
 import Form from '../components/Form';
 import Logo from '../components/Logo';
 import Signup from './Signup';
-
+import testProperties from '../utility/helper'
 import AsyncStorage from '@react-native-community/async-storage';
 
 import AzureAuth from 'react-native-azure-auth';
@@ -23,8 +23,8 @@ export default class Login extends Component<{}> {
     this.setState({ user: info.displayName, userId: tokens.userId })
   } catch (error) {
     console.log(error)
-  }
-  }
+  }}
+  
   
   render() {
     return (
@@ -33,7 +33,10 @@ export default class Login extends Component<{}> {
         <Form type="Sign in" navigation={this.props.navigation}/>
         <TouchableOpacity
         style={styles.azureButton}
-        onPress={onPress}>
+        // onPress={onPressAzureLogin}
+        onPress={() => this.onPressAzureLogin()}
+        {...testProperties('loginviaAzure')}
+        >
           <Text>LoginViaAzure</Text>
          </TouchableOpacity>
         </View>
