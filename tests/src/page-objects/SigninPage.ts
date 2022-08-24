@@ -20,7 +20,14 @@ const SELECTORS = {
 
 class SigninPage extends Page {
 
+  async continue()
+  {
+        await $(SELECTORS.CONTINUE).waitForDisplayed();
+        await $(SELECTORS.CONTINUE).touchAction('tap');
+  }
+
   async enterEmail(email) {
+        this.continue()
           await $(SELECTORS.EMAIL).waitForDisplayed();
           await $(SELECTORS.EMAIL).touchAction('tap');
           await $(SELECTORS.EMAIL).setValue(email)    
