@@ -7,7 +7,8 @@ import SigninPage from '../page-objects/SigninPage';
 import { setTimeout } from 'timers/promises';
 import { config } from '../../../config/wdio.conf'
 
-Given(/(.*) is at the app to login via Azure/, async (actor) => {
+
+Given('{string} is at the app to login via Azure', async (actor) => {
   await HomePage.selectADZureLogin()
 });
 
