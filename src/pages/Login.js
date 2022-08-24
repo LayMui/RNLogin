@@ -77,7 +77,7 @@ export default class Login extends Component<{}> {
     azureButton: {
     alignItems: "center",
     backgroundColor: "#DDDDDD",
-    padding: 10
+    padding: 10,
     },
   });
   

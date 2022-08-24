@@ -1,0 +1,50 @@
+<?xml version='1.0'?>
+<ns2:test-suite xmlns:ns2='urn:model.allure.qatools.yandex.ru' start='1661315598260' stop='1661315598274'>
+    <name>Login via Azure AD</name>
+    <title>Login via Azure AD</title>
+    <test-cases>
+        <test-case start='1661315598263' status='broken' stop='1661315598272'>
+            <name>Able to login via Azure AD</name>
+            <title>Able to login via Azure AD</title>
+            <labels>
+                <label name='language' value='javascript'/>
+                <label name='framework' value='wdio'/>
+                <label name='thread' value='0-0'/>
+            </labels>
+            <parameters>
+                <parameter kind='argument' name='device' value='iPhone 13-15.5'/>
+            </parameters>
+            <steps>
+                <step start='1661315598266' status='broken' stop='1661315598267'>
+                    <name>Given James is at the app to login via Azure</name>
+                    <title>Given James is at the app to login via Azure</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1661315598268' status='broken' stop='1661315598272'>
+                    <name>When he provides email to sign in</name>
+                    <title>When he provides email to sign in</title>
+                    <attachments>
+                        <attachment title='Data Table' source='bdeef374-74e3-48e9-a3c7-17107d7806fc-attachment.csv' type='text/csv' size='45'/>
+                    </attachments>
+                    <steps/>
+                </step>
+                <step start='1661315598272' status='broken' stop='1661315598272'>
+                    <name>Then he is able to access the app</name>
+                    <title>Then he is able to access the app</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+            </steps>
+            <attachments/>
+            <failure>
+                <message>Step "he is able to access the app" is not defined. You can ignore this error by setting cucumberOpts.ignoreUndefinedDefinitions as true.</message>
+                <stack-trace>Step "he is able to access the app" is not defined. You can ignore this error by setting cucumberOpts.ignoreUndefinedDefinitions as true.
+                	at Feature(/Users/a845751yara.com/poc/RNLogin/tests/features/AzureADAuth.feature):1:1
+                	at Scenario(Able to login via Azure AD):7:3
+                	at Step(he is able to access the app):12:5
+                </stack-trace>
+            </failure>
+        </test-case>
+    </test-cases>
+</ns2:test-suite>
