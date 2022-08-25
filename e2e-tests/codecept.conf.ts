@@ -5,10 +5,23 @@ export const config: CodeceptJS.MainConfig = {
     Appium: {
       app: '../tests/apps/RNLogin.app',
       platform: 'iOS',
-      device: 'emulator',
-      deviceName: 'iPhone 13',
-      platformVersion: '15.5',
-      automationName: 'XCUITest',
+      device: 'simulator',
+      port: 4723,
+      path: '/wd/hub',
+      desiredCapabilities:{
+        deviceName: 'iPhone 13',
+        platformVersion: '15.5',
+        platformName: 'iOS',
+        automationName: 'XCUITest',
+        launchTimeout: 40000,
+        autoDismissAlerts: true,
+        showIOSLog: true,
+        enableAsyncExecuteFromHttps: true,
+        noReset: false,
+        noSign: true,
+
+      }
+
 
     }
   },

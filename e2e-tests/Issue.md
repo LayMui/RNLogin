@@ -7,8 +7,8 @@ Using test root "/Users/a845751yara.com/poc/RNLogin/e2e-tests"
 
 login --
   test something
-2022-08-25T07:51:07.108Z ERROR webdriver: Request failed with status 500 due to session not created: A new session could not be created. Details: Appium's IosDriver does not support Xcode version 13.4.1. Apple has deprecated UIAutomation. Use the "XCUITest" automationName capability instead.
-2022-08-25T07:51:07.108Z ERROR webdriver: session not created: A new session could not be created. Details: Appium's IosDriver does not support Xcode version 13.4.1. Apple has deprecated UIAutomation. Use the "XCUITest" automationName capability instead.
+2022-08-25T13:04:29.522Z ERROR webdriver: Request failed with status 500 due to unknown error: An unknown server-side error occurred while processing the command. Original error: Could not create simulator with name 'appiumTest-C65A7284-094E-4F98-8366-7630B4872CCD-simulator', device type id 'simulator', with runtime ids 'com.apple.CoreSimulator.SimRuntime.iOS-15-5'
+2022-08-25T13:04:29.523Z ERROR webdriver: unknown error: An unknown server-side error occurred while processing the command. Original error: Could not create simulator with name 'appiumTest-C65A7284-094E-4F98-8366-7630B4872CCD-simulator', device type id 'simulator', with runtime ids 'com.apple.CoreSimulator.SimRuntime.iOS-15-5'
     at Object.getErrorFromResponseBody (/Users/a845751yara.com/poc/RNLogin/e2e-tests/node_modules/webdriver/build/utils.js:94:12)
     at WebDriverRequest._request (/Users/a845751yara.com/poc/RNLogin/e2e-tests/node_modules/webdriver/build/request.js:134:31)
     at processTicksAndRejections (node:internal/process/task_queues:96:5)
@@ -18,8 +18,12 @@ login --
     at async Appium._startBrowser (/Users/a845751yara.com/poc/RNLogin/e2e-tests/node_modules/codeceptjs/lib/helper/Appium.js:232:24)
 Error: Can't connect to WebDriver.
 Error: Failed to create session.
-A new session could not be created. Details: Appium's IosDriver does not support Xcode version 13.4.1. Apple has deprecated UIAutomation. Use the "XCUITest" automationName capability instead.
+An unknown server-side error occurred while processing the command. Original error: Could not create simulator with name 'appiumTest-C65A7284-094E-4F98-8366-7630B4872CCD-simulator', device type id 'simulator', with runtime ids 'com.apple.CoreSimulator.SimRuntime.iOS-15-5'
 
 Please make sure Selenium Server is running and accessible
-  ✔ OK in 7ms
+  ✔ OK in 6ms
+
+
+  OK  | 1 passed   // 8s
+✨  Done in 11.67s.
 ```
