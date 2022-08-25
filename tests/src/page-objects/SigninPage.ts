@@ -9,7 +9,8 @@ import { setTimeout } from 'timers/promises';
 const SELECTORS = {
   NEXT: '~Next',
   CONTINUE: '~Continue',
-  EMAIL: '~Enter your email, phone, or Skype.'
+  EMAIL: '~Enter your email, phone, or Skype.',
+  CANCEL: '~Cancel'
 
 
   // IOS
@@ -30,7 +31,13 @@ class SigninPage extends Page {
         this.continue()
           await $(SELECTORS.EMAIL).waitForDisplayed();
           await $(SELECTORS.EMAIL).touchAction('tap');
+          await $(SELECTORS.EMAIL).clearValue();  
           await $(SELECTORS.EMAIL).setValue(email)    
+          await $(SELECTORS.NEXT).touchAction('tap')
+  }
+
+  async goToNext(){
+    await $(SELECTORS.CANCEL).isDisplayed()
   }
 
     open() {
