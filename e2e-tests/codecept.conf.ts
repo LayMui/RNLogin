@@ -12,7 +12,6 @@ export const config: CodeceptJS.MainConfig = {
         deviceName: 'iPhone 13',
         platformVersion: '15.5',
         platformName: 'iOS',
-        automationName: 'XCUITest',
         launchTimeout: 40000,
         autoDismissAlerts: true,
         showIOSLog: true,
