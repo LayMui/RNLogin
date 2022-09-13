@@ -1,0 +1,516 @@
+version: 2.1
+
+slack-fail-post-step: &slack-notify-failure
+  slack/notify:
+    custom: |
+      {
+        "blocks": [
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "RN Login Mobile Test on ${PLATFORM} ${STATUSTEXT} \n Repo: ${REPO_NAME} \nBuild Number: #${BUILD_NUMBER}\n Branch: ${CIRCLE_BRANCH}\nby ${USERNAME}"
+              }
+            },
+            {
+              "type": "actions",
+              "elements": [
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "View Job"
+                  },
+                  "style": "primary",
+                  "value": "click_me_123",
+                  "url": "${CIRCLE_BUILD_URL}"
+                },
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "View Result"
+                  },
+                  "style": "primary",
+                  "value": "click_me_123",
+                  "url": "http://um-login-cucumber-report-${PLATFORM}-${ENVIRONMENT}.s3-website-ap-southeast-1.amazonaws.com"
+                },
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "View on Browserstack"
+                  },
+                  "style": "primary",
+                  "value": "click_me_123",
+                  "url": "$PUBLIC_URL_TO_BROWSERSTACK"
+                }
+              ]
+            }
+        ]
+      }
+    event: fail
+
+send-pass-notification: &slack-notify-success
+  slack/notify:
+    custom: |
+      {
+        "blocks": [
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "UM Login Mobile Test on ${PLATFORM} ${STATUSTEXT}\n Repo: ${REPO_NAME} \nBuild Number: #${BUILD_NUMBER}\n Branch: ${CIRCLE_BRANCH}\nby ${USERNAME}"
+              }
+            },
+            {
+              "type": "actions",
+              "elements": [
+                 {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "View Job"
+                  },
+                  "style": "primary",
+                  "value": "click_me_123",
+                  "url": "${CIRCLE_BUILD_URL}"
+                },
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "View Result"
+                  },
+                  "style": "primary",
+                  "value": "click_me_123",
+                  "url": "http://um-login-cucumber-report-${PLATFORM}-${ENVIRONMENT}.s3-website-ap-southeast-1.amazonaws.com"
+                },
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "View on Browserstack"
+                  },
+                  "style": "primary",
+                  "value": "click_me_123",
+                 "url": "$PUBLIC_URL_TO_BROWSERSTACK"
+                }
+              ]
+            }
+        ]
+      }
+    event: pass
+
+orbs:
+  ruby: circleci/ruby@1.2.0
+  slack: circleci/slack@4.10.1
+  aws-cli: circleci/aws-cli@3.1
+  node: circleci/node@5.0.2
+
+parameters:
+  run_integration_tests_from_other_repo:
+    type: boolean
+    default: false
+
+  build_number:
+    type: integer
+    default: 0
+
+  repo_name:
+    type: string
+      # NOTE: env var values cannot be evaluated when the config YAML is parsed.
+      # hence, we cannot set ${CIRCLE_PROJECT_REPONAME} as a default here.
+    default: ''
+
+  username:
+    type: string
+    default: ''
+
+  default_branch:
+    type: string
+    default: ''
+
+commands:
+  create-private-npmrc:
+    steps:
+      - run:
+          name: Create private .npmrc
+          command: |
+            echo "@yaradigitallabs:registry=https://npm.pkg.github.com
+            //npm.pkg.github.com/:_authToken=${GITHUB_PERSONAL_ACCESS_TOKEN}
+            always-auth=true" > ~/.npmrc
+            echo "@bit:registry=https://node.bit.dev
+            //node.bitsrc.io/:_authToken=${AHUA_DESIGN_SYSTEM_BITSRC_ACCESS_TOKEN}
+            //node.bit.dev/:_authToken=${AHUA_DESIGN_SYSTEM_BITDEV_ACCESS_TOKEN}
+            " >> ~/.npmrc 
+
+  clone-packages:
+    steps:
+     - run:
+          name: Clone dependency packages
+          command: |
+            scripts/clone-package.sh sh-custom-embedded-login $BRANCH_NAME
+            scripts/clone-package.sh sh-user-management 'feature/embedded-flow'
+
+
+  set-custom-env-var:
+    steps:
+      - run:
+          name: set REPO_NAME, BRANCH_NAME, USERNAME and BUILD_NUMBER
+          command: |
+            if [ -n "<< pipeline.parameters.repo_name >>" ]; then
+              echo "export REPO_NAME='<< pipeline.parameters.repo_name >>'" >> $BASH_ENV
+            else
+              echo "export REPO_NAME='$CIRCLE_PROJECT_REPONAME'" >> $BASH_ENV              
+            fi
+            if [ -n "<< pipeline.parameters.default_branch >>" ]; then
+              echo "export BRANCH_NAME='<< pipeline.parameters.default_branch >>'" >> $BASH_ENV
+            else
+             echo "export BRANCH_NAME='dev'" >> $BASH_ENV  
+            fi
+            if [ -n "<< pipeline.parameters.build_number >>" ]; then
+              echo "export BUILD_NUMBER='$CIRCLE_BUILD_NUM'" >> $BASH_ENV         
+            else
+              echo "export BUILD_NUMBER='<< pipeline.parameters.build_number >>'" >> $BASH_ENV
+            fi
+             if [ -n "<< pipeline.parameters.username >>" ]; then
+              echo "export USERNAME='<< pipeline.parameters.username >>'" >> $BASH_ENV
+            else
+              echo "export USERNAME='$CIRCLE_USERNAME'" >> $BASH_ENV              
+            fi
+          when: always
+
+  mark-test-status:
+    steps:
+      - run:
+          name: Mark test status
+          command: | 
+            STATUS="failed"
+            REASON="Test has failed"
+            echo 'export STATUSTEXT="❌ *Failure*"' >> $BASH_ENV
+            if [[ `grep "Done in " /tmp/log` ]]; then
+              STATUS="passed"
+              REASON="Test has some passes"
+              echo 'export STATUSTEXT="✅ *Success*"' >> $BASH_ENV
+            fi
+            echo "STATUS: $STATUS"
+            echo "REASON: $REASON"
+            STATUS_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X PUT -H "Content-Type: application/json"  -d "{\"status\":\"${STATUS}\", \"reason\":\"${REASON}\"}" https://api-cloud.browserstack.com/app-automate/sessions/${BROWSERSTACK_SESSIONID}.json)
+            echo "get test status: ", $STATUS_RESPONSE
+          when: always
+
+  get-public-url:
+    steps:
+      - run:
+          name: Get public url
+          command: |
+            echo "BROWSERSTACK_SESSIONID: $BROWSERSTACK_SESSIONID"
+            GET_SESSION_DETAILS_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X GET https://api-cloud.browserstack.com/app-automate/sessions/${BROWSERSTACK_SESSIONID}.json)
+            echo "GET_SESSION_DETAILS_RESPONSE :  " + $GET_SESSION_DETAILS_RESPONSE
+            PUBLIC_URL_TO_BROWSERSTACK=$(echo $GET_SESSION_DETAILS_RESPONSE | jq -r ".automation_session.public_url")
+            echo "export PUBLIC_URL_TO_BROWSERSTACK=$PUBLIC_URL_TO_BROWSERSTACK" >> $BASH_ENV
+              
+            if [ $PUBLIC_URL_TO_BROWSERSTACK != null ]; then
+              echo "Setting value of public url to browserstack " + $PUBLIC_URL_TO_BROWSERSTACK;
+            else
+              GET_SESSIONID_ERROR_MESSAGE=$(echo $GET_SESSION_DETAILS_RESPONSE| jq -r ".error")
+              echo "get sessionID failed, reason : ,$GET_SESSIONID_ERROR_MESSAGE"
+              exit 1;
+              fi
+          when: always
+
+  generate-report:
+    steps:
+      - run:
+          name: Generate the report
+          command: |
+            node reporter/index.js
+          when: always
+
+  run-unit-test:
+    steps:
+      - run:
+          name: Run unit test
+          command: |
+              yarn test
+
+jobs:
+  ios-build-and-test:
+    working_directory: ~/sh-usermanagement-native-poc
+    macos:
+      xcode: 13.3.1
+
+    parameters:
+      platform:
+        type: enum
+        enum: ['ios', 'android']
+        default: 'ios'
+
+      environment:
+        type: enum
+        enum: ['stage', 'preprod']
+        default: 'stage'
+
+    environment:
+      FASTLANE_LANE: testandbuild
+      PLATFORM: << parameters.platform >>
+      ENVIRONMENT: << parameters.environment >>
+
+    shell: /bin/bash --login -o pipefail
+    # resource_class: large
+
+    steps:
+      - checkout
+      - aws-cli/setup
+      - create-private-npmrc
+      - set-custom-env-var
+      - clone-packages
+
+      - restore_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+
+      - run: yarn install
+      - run-unit-test
+
+      - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+            - ~/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+            - node_modules
+
+      - run:
+          command: ln -s $(which node) /usr/local/bin/node
+
+      - run:
+          command: pod install
+          working_directory: ios
+
+      - run:
+          command: bundle install
+          working_directory: ios
+
+      - save_cache:
+          key: bundle-v1-{{ checksum "ios/Gemfile.lock" }}-{{ arch }}
+          paths:
+            - vendor/bundle
+
+      - save_cache:
+          key: pods-v1-{{ checksum "ios/Podfile.lock" }}-{{ arch }}
+          paths:
+            - ios/Pods
+      - run:
+          name: Fastlane
+          command: |
+            sudo xcode-select -s /Applications/Xcode-13.3.1.app
+            bundle exec fastlane $FASTLANE_LANE
+          working_directory: ios
+
+      - store_artifacts:
+          path: ios/nativeIntegration.ipa
+
+      - run:
+          name: App upload and Set app id in environment variable.
+          command: |
+            APP_UPLOAD_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST https://api-cloud.browserstack.com/app-automate/upload -F "file=@/Users/distiller/sh-usermanagement-native-poc/ios/nativeIntegration.ipa")
+            echo "APP_UPLOAD_RESPONSE :  " + $APP_UPLOAD_RESPONSE
+            APP_ID=$(echo $APP_UPLOAD_RESPONSE | jq -r ".app_url")
+            if [ $APP_ID != null ]; then
+              echo "Apk uploaded to BrowserStack with app id : ",$APP_ID;
+              echo "export BROWSERSTACK_APP_ID_IOS=$APP_ID" >> $BASH_ENV;
+              source $BASH_ENV;
+              echo "Setting value of BROWSERSTACK_APP_ID_IOS in environment variables to" + $APP_ID;
+            else
+              UPLOAD_ERROR_MESSAGE=$(echo $APP_UPLOAD_RESPONSE | jq -r ".error")
+              echo "App upload failed, reason : ",$UPLOAD_ERROR_MESSAGE
+              exit 1;
+            fi
+            echo "BROWSERSTACK_APP_ID_IOS: " $BROWSERSTACK_APP_ID_IOS;
+
+
+      - run:
+          name: Run the test
+          command: | 
+            yarn test:execute:ios:ipa | tee /tmp/log || true
+            BROWSERSTACK_SESSIONID=$(grep "BROWSERSTACK_SESSIONID:" /tmp/log | head -1 | sort -t: -u -k1,1  |sed 's/[0-1]//' | cut -d: -f2)
+            echo "export BROWSERSTACK_SESSIONID=$BROWSERSTACK_SESSIONID" >> $BASH_ENV 
+
+      - mark-test-status
+      - get-public-url
+      - generate-report
+
+      - run:
+          name: Copy test results to S3
+          command: |
+            aws s3 cp reporter s3://um-login-cucumber-report-<< parameters.platform >>-<< parameters.environment >> --recursive --acl public-read-write
+          # setting always so this S3 copy is run whether tests failed or succeeded
+          when: always
+
+      - <<: *slack-notify-failure
+      - <<: *slack-notify-success
+
+  android-build-and-test:
+    working_directory: ~/sh-usermanagement-native-poc
+
+    parameters:
+      platform:
+        type: enum
+        enum: ['ios', 'android']
+        default: 'android'
+
+      environment:
+        type: enum
+        enum: ['stage', 'preprod']
+        default: 'preprod'
+
+    environment:
+      FASTLANE_LANE: beta_release
+      PLATFORM: << parameters.platform >>
+      ENVIRONMENT: << parameters.environment >>
+      GRADLE_OPTS: -Xmx3200m
+
+    docker:
+      - image: cimg/android:2022.04.1
+
+    resource_class: large
+
+    steps:
+      - checkout
+      - aws-cli/setup
+      - create-private-npmrc
+      - set-custom-env-var
+      - clone-packages
+
+      - node/install:
+          install-yarn: true
+          node-version: '16.14'
+
+      - restore_cache:
+          key: jars-{{ checksum "android/app/build.gradle" }}-{{ checksum  "android/app/build.gradle" }}
+
+      - restore_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+
+      - run:
+          name: yarn install
+          command: yarn
+
+      - run-unit-test
+
+      - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+            - ~/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+            - node_modules
+
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+          working_directory: android
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "android/app/build.gradle" }}-{{ checksum  "android/app/build.gradle" }}
+
+      - run:
+          name: Decrypt keystore
+          command: echo $RELEASE_KEYSTORE_BASE64 | base64 -d > android/app/yara-auth0-poc-store.keystore
+      # Generate apk
+      - run:
+            name: Generate apk
+            command: ./gradlew assembleRelease
+            working_directory: android
+
+
+      - store_artifacts:
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - run:
+          name: App upload and Set app id in environment variable.
+          command: |
+            APP_UPLOAD_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST https://api-cloud.browserstack.com/app-automate/upload -F "file=@/home/circleci/sh-usermanagement-native-poc/android/app/build/outputs/apk/release/app-release.apk")
+            echo "APP_UPLOAD_RESPONSE :  " + $APP_UPLOAD_RESPONSE
+            APP_ID=$(echo $APP_UPLOAD_RESPONSE | jq -r ".app_url")
+            if [ $APP_ID != null ]; then
+              echo "Apk uploaded to BrowserStack with app id : ",$APP_ID;
+              echo "export BROWSERSTACK_APP_ID_ANDROID=$APP_ID" >> $BASH_ENV;
+              source $BASH_ENV;
+              echo "Setting value of BROWSERSTACK_APP_ID_ANDROID in environment variables to " + $APP_ID;
+            else
+              UPLOAD_ERROR_MESSAGE=$(echo $APP_UPLOAD_RESPONSE | jq -r ".error")
+              echo "App upload failed, reason : ",$UPLOAD_ERROR_MESSAGE
+              exit 1;
+            fi
+
+            echo "BROWSERSTACK_APP_ID_ANDROID: " $BROWSERSTACK_APP_ID_ANDROID;
+
+      - run:
+          name: Run the test
+          command: |
+             yarn test:execute:android:apk | tee /tmp/log || true
+             BROWSERSTACK_SESSIONID=$(grep "BROWSERSTACK_SESSIONID:" /tmp/log | head -1 | sort -t: -u -k1,1  |sed 's/[0-1]//' | cut -d: -f2)
+             echo "export BROWSERSTACK_SESSIONID=$BROWSERSTACK_SESSIONID" >> $BASH_ENV 
+
+      - mark-test-status
+      - get-public-url
+      - generate-report
+
+      - run:
+          name: Copy test results to S3
+          command: |
+            aws s3 cp reporter s3://um-login-cucumber-report-<< parameters.platform >>-<< parameters.environment >> --recursive --acl public-read-write
+          # setting always so this S3 copy is run whether tests failed or succeeded
+          when: always
+
+      - <<: *slack-notify-failure
+      - <<: *slack-notify-success
+
+workflows:
+  android-ios:
+    jobs:
+      - android-build-and-test:
+          name: 'android build and test'
+          context:
+            - CIRCLE_CI_SLACK_UMLOGIN
+            - CIRCLE_CI_AWS_IAM_APAC_EKS_STAGE
+          filters:
+            branches:
+              only:
+                - master
+                - /circleci-.*/
+                - /feature.*/
+
+
+      - ios-build-and-test:
+          name: 'ios build and test'
+          context:
+            - CIRCLE_CI_SLACK_UMLOGIN
+            - CIRCLE_CI_AWS_IAM_APAC_EKS_STAGE
+          filters:
+            branches:
+              only:
+                - master
+                - /circleci-.*/
+                - /feature.*/

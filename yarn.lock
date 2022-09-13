@@ -2137,6 +2137,16 @@
   resolved "https://registry.npmjs.org/@react-native-community/masked-view/-/masked-view-0.1.11.tgz#2f4c6e10bee0786abff4604e39a37ded6f3980ce"
   integrity sha512-rQfMIGSR/1r/SyN87+VD8xHHzDYeHaJq6elOSCAD+0iLagXkSI2pfA0LmSXP21uw5i3em7GkkRjfJ8wpqWXZNw==
 
+"@react-native-picker/picker@^1.8.3":
+  version "1.16.8"
+  resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-1.16.8.tgz#2126ca54d4a5a3e9ea5e3f39ad1e6643f8e4b3d4"
+  integrity sha512-pacdQDX6V6EmjF+HoiIh6u++qx4mTK0WnhgUHRc01B+Qt5eoeUwseBqmqfTSXTx/aHDEd6PiIw7UGvKgFoqgFQ==
+
+"@react-native-picker/picker@^2.4.4":
+  version "2.4.4"
+  resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-2.4.4.tgz#4e4d2ec4b040e24d8b99c6be8f8b3201bb29fad3"
+  integrity sha512-sz5CPAE8cu//RGOSK4tIcbVi/uNihznrIk4D656/5iz5cqg1zHbVeaQf1eLJRlT7EW1KCH40nk3z4Fzqjmaarw==
+
 "@react-native/assets@1.0.0":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@react-native/assets/-/assets-1.0.0.tgz#c6f9bf63d274bafc8e970628de24986b30a55c8e"
@@ -11516,6 +11526,14 @@ react-native-gradle-plugin@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.6.tgz#b61a9234ad2f61430937911003cddd7e15c72b45"
   integrity sha512-eIlgtsmDp1jLC24dRn43hB3kEcZVqx6DUQbR0N1ABXGnMEafm9I3V3dUUeD1vh+Dy5WqijSoEwLNUPLgu5zDMg==
+
+react-native-picker-select@^8.0.4:
+  version "8.0.4"
+  resolved "https://registry.npmjs.org/react-native-picker-select/-/react-native-picker-select-8.0.4.tgz#3f7f1f42df69b06e7d2c10338288332a6c40fd10"
+  integrity sha512-orBjPIwBkV5oipyVw263YNMI56f6Kj3p/ejabZoCYYNSG3AiLVVhC2RqsxMgDA7IayyURAW+AlV+mDJyVqLBkg==
+  dependencies:
+    "@react-native-picker/picker" "^1.8.3"
+    lodash.isequal "^4.5.0"
 
 react-native-reanimated@^2.9.1:
   version "2.9.1"

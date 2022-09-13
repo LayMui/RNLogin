@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import { Text, View } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
 
 export default class Home extends Component<{}> {
     render() {
       return (
-
-
 
         <View
         style={{
@@ -13,7 +12,18 @@ export default class Home extends Component<{}> {
           justifyContent: "center",
           alignItems: "center"
         }}>
-        <Text>Hello, world!</Text>
+        
+        <RNPickerSelect
+    
+      touchableWrapperProps={{ accessibilityLabel: 'pickerSelect'}}
+  
+            onValueChange={(value) => console.log(value)}
+            items={[
+                { label: 'Football', value: 'football' },
+                { label: 'Baseball', value: 'baseball' },
+                { label: 'Hockey', value: 'hockey' },
+            ]}
+        />    
       </View>
         );
       };

@@ -8,6 +8,8 @@ import { config } from '../../../config/wdio.conf'
 const SELECTORS = {
   // Using accessibilityLabel and testID
   LOGIN_VIA_AZURE_AD: '~loginviaAzure',
+  LOGIN: '~login',
+  PICKER: '~pickerSelect'
  // Need to use xpath on Browserstack devices
 
   // IOS
@@ -24,7 +26,18 @@ class HomePage extends Page {
       (await $(SELECTORS.LOGIN_VIA_AZURE_AD).touchAction('tap'));
    // }
   }
+  async selectLogin() {
+      (await $(SELECTORS.LOGIN).waitForDisplayed()) &&
+       (await $(SELECTORS.LOGIN).touchAction('tap'));
+   }
 
+
+   async selectSport(sport) {
+    (await $(SELECTORS.PICKER).waitForDisplayed()) &&
+     (await $(SELECTORS.PICKER).touchAction('tap'));
+     await $(SELECTORS.PICKER).setValue('football');
+ }
+ 
 
   open() {
     return super.open('home');
