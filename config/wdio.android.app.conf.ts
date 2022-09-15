@@ -27,7 +27,7 @@ config.capabilities = [
     'appium:automationName': 'UiAutomator2',
     // The path to the app
     'appium:app': join(process.cwd(), './tests/apps/app-debug.apk'),
-    'appium:appWaitActivity': 'com.nativeintegration.MainActivity',
+    'appium:appWaitActivity': 'com.rnlogin.MainActivity',
     // Read the reset strategies very well, they differ per platform, see
     // http://appium.io/docs/en/writing-running-appium/other/reset-strategies/
     'appium:noReset': false,

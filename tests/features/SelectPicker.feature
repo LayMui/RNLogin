@@ -3,7 +3,6 @@ Feature: Select Picker
   As a farmer James
   James want to able select sport using the select picker
 
-  @test
   Scenario: Able to select sport using select picker
     Given James is at the app to login
     When he select a sport
