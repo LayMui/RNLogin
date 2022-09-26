@@ -138,33 +138,6 @@ parameters:
     default: ''
 
 commands:
-  set-custom-env-var:
-    steps:
-      - run:
-          name: set REPO_NAME, BRANCH_NAME, USERNAME and BUILD_NUMBER
-          command: |
-            if [ -n "<< pipeline.parameters.repo_name >>" ]; then
-              echo "export REPO_NAME='<< pipeline.parameters.repo_name >>'" >> $BASH_ENV
-            else
-              echo "export REPO_NAME='$CIRCLE_PROJECT_REPONAME'" >> $BASH_ENV              
-            fi
-            if [ -n "<< pipeline.parameters.default_branch >>" ]; then
-              echo "export BRANCH_NAME='<< pipeline.parameters.default_branch >>'" >> $BASH_ENV
-            else
-             echo "export BRANCH_NAME='dev'" >> $BASH_ENV  
-            fi
-            if [ -n "<< pipeline.parameters.build_number >>" ]; then
-              echo "export BUILD_NUMBER='$CIRCLE_BUILD_NUM'" >> $BASH_ENV         
-            else
-              echo "export BUILD_NUMBER='<< pipeline.parameters.build_number >>'" >> $BASH_ENV
-            fi
-             if [ -n "<< pipeline.parameters.username >>" ]; then
-              echo "export USERNAME='<< pipeline.parameters.username >>'" >> $BASH_ENV
-            else
-              echo "export USERNAME='$CIRCLE_USERNAME'" >> $BASH_ENV              
-            fi
-          when: always
-
   mark-test-status:
     steps:
       - run:
@@ -221,7 +194,7 @@ commands:
 
 jobs:
   ios-build-and-test:
-    working_directory: ~/sh-usermanagement-native-poc
+    working_directory: ~/RNLogin
     macos:
       xcode: 13.3.1
 
@@ -246,8 +219,6 @@ jobs:
 
     steps:
       - checkout
-      - aws-cli/setup
-      - set-custom-env-var
 
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
@@ -365,8 +336,6 @@ jobs:
 
     steps:
       - checkout
-      - aws-cli/setup
-      - set-custom-env-var
 
       - node/install:
           install-yarn: true
@@ -451,40 +420,20 @@ jobs:
       - get-public-url
       - generate-report
 
-      - run:
-          name: Copy test results to S3
-          command: |
-            aws s3 cp reporter s3://um-login-cucumber-report-<< parameters.platform >>-<< parameters.environment >> --recursive --acl public-read-write
-          # setting always so this S3 copy is run whether tests failed or succeeded
-          when: always
-
-      - <<: *slack-notify-failure
-      - <<: *slack-notify-success
-
 workflows:
   android-ios:
     jobs:
       - android-build-and-test:
           name: 'android build and test'
-          context:
-            - CIRCLE_CI_SLACK_UMLOGIN
-            - CIRCLE_CI_AWS_IAM_APAC_EKS_STAGE
           filters:
             branches:
               only:
                 - master
-                - /circleci-.*/
-                - /feature.*/
 
 
       - ios-build-and-test:
           name: 'ios build and test'
-          context:
-            - CIRCLE_CI_SLACK_UMLOGIN
-            - CIRCLE_CI_AWS_IAM_APAC_EKS_STAGE
           filters:
             branches:
               only:
                 - master
-                - /circleci-.*/
-                - /feature.*/
