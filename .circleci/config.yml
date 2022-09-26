@@ -425,6 +425,8 @@ workflows:
     jobs:
       - android-build-and-test:
           name: 'android build and test'
+          context:
+            - BROWSERSTACK_CREDENTIALS
           filters:
             branches:
               only:
@@ -433,6 +435,8 @@ workflows:
 
       - ios-build-and-test:
           name: 'ios build and test'
+          context:
+            - BROWSERSTACK_CREDENTIALS
           filters:
             branches:
               only:
