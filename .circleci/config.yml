@@ -138,28 +138,6 @@ parameters:
     default: ''
 
 commands:
-  create-private-npmrc:
-    steps:
-      - run:
-          name: Create private .npmrc
-          command: |
-            echo "@yaradigitallabs:registry=https://npm.pkg.github.com
-            //npm.pkg.github.com/:_authToken=${GITHUB_PERSONAL_ACCESS_TOKEN}
-            always-auth=true" > ~/.npmrc
-            echo "@bit:registry=https://node.bit.dev
-            //node.bitsrc.io/:_authToken=${AHUA_DESIGN_SYSTEM_BITSRC_ACCESS_TOKEN}
-            //node.bit.dev/:_authToken=${AHUA_DESIGN_SYSTEM_BITDEV_ACCESS_TOKEN}
-            " >> ~/.npmrc 
-
-  clone-packages:
-    steps:
-     - run:
-          name: Clone dependency packages
-          command: |
-            scripts/clone-package.sh sh-custom-embedded-login $BRANCH_NAME
-            scripts/clone-package.sh sh-user-management 'feature/embedded-flow'
-
-
   set-custom-env-var:
     steps:
       - run:
@@ -269,9 +247,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup
-      - create-private-npmrc
       - set-custom-env-var
-      - clone-packages
 
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
@@ -390,9 +366,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup
-      - create-private-npmrc
       - set-custom-env-var
-      - clone-packages
 
       - node/install:
           install-yarn: true
