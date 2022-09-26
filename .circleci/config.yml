@@ -185,13 +185,6 @@ commands:
             node reporter/index.js
           when: always
 
-  run-unit-test:
-    steps:
-      - run:
-          name: Run unit test
-          command: |
-              yarn test
-
 jobs:
   ios-build-and-test:
     working_directory: ~/RNLogin
@@ -227,7 +220,6 @@ jobs:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
 
       - run: yarn install
-      - run-unit-test
 
       - save_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
@@ -354,8 +346,6 @@ jobs:
       - run:
           name: yarn install
           command: yarn
-
-      - run-unit-test
 
       - save_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
