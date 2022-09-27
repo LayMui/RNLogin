@@ -9,7 +9,9 @@
     "test": "jest",
     "lint": "eslint .",
     "test:execute:ios": "cross-env wdio config/wdio.ios.app.conf.ts",
-    "test:execute:android": "cross-env wdio config/wdio.android.app.conf.ts"
+    "test:execute:android": "cross-env wdio config/wdio.android.app.conf.ts",
+    "test:execute:ios:ipa": "wdio config/wdio.ios.app.bs.ts",
+    "test:execute:android:apk": "wdio config/wdio.android.app.bs.ts"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.13.15",
