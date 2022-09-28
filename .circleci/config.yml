@@ -264,7 +264,7 @@ jobs:
       - run:
           name: App upload and Set app id in environment variable.
           command: |
-            APP_UPLOAD_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST https://api-cloud.browserstack.com/app-automate/upload -F "file=@/Users/distiller/sh-usermanagement-native-poc/ios/nativeIntegration.ipa")
+            APP_UPLOAD_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST https://api-cloud.browserstack.com/app-automate/upload -F "file=@/Users/distiller/RNLogin/ios/RNLogin.ipa")
             echo "APP_UPLOAD_RESPONSE :  " + $APP_UPLOAD_RESPONSE
             APP_ID=$(echo $APP_UPLOAD_RESPONSE | jq -r ".app_url")
             if [ $APP_ID != null ]; then
@@ -302,7 +302,7 @@ jobs:
       - <<: *slack-notify-success
 
   android-build-and-test:
-    working_directory: ~/sh-usermanagement-native-poc
+    working_directory: ~/RNLogin
 
     parameters:
       platform:
@@ -383,7 +383,7 @@ jobs:
       - run:
           name: App upload and Set app id in environment variable.
           command: |
-            APP_UPLOAD_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST https://api-cloud.browserstack.com/app-automate/upload -F "file=@/home/circleci/sh-usermanagement-native-poc/android/app/build/outputs/apk/release/app-release.apk")
+            APP_UPLOAD_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST https://api-cloud.browserstack.com/app-automate/upload -F "file=@/home/circleci/RNLogin/android/app/build/outputs/apk/release/app-release.apk")
             echo "APP_UPLOAD_RESPONSE :  " + $APP_UPLOAD_RESPONSE
             APP_ID=$(echo $APP_UPLOAD_RESPONSE | jq -r ".app_url")
             if [ $APP_ID != null ]; then
