@@ -259,7 +259,7 @@ jobs:
           working_directory: ios
 
       - store_artifacts:
-          path: ios/nativeIntegration.ipa
+          path: ios/RNLogin.ipa
 
       - run:
           name: App upload and Set app id in environment variable.
