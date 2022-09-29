@@ -288,8 +288,8 @@ jobs:
             echo "export BROWSERSTACK_SESSIONID=$BROWSERSTACK_SESSIONID" >> $BASH_ENV 
 
       - mark-test-status
-      - get-public-url
-      - generate-report
+      # - get-public-url
+      # - generate-report
 
       - run:
           name: Copy test results to S3
@@ -407,8 +407,8 @@ jobs:
              echo "export BROWSERSTACK_SESSIONID=$BROWSERSTACK_SESSIONID" >> $BASH_ENV 
 
       - mark-test-status
-      - get-public-url
-      - generate-report
+      # - get-public-url
+      # - generate-report
 
 workflows:
   android-ios:
