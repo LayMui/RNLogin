@@ -20,7 +20,13 @@ const SELECTORS = {
 
 class HomePage extends Page {
 
+  setSessionID() {
+    process.env['BROWSERSTACK_SESSIONID'] = driver.sessionId
+    console.log('BROWSERSTACK_SESSIONID:' + process.env.BROWSERSTACK_SESSIONID)
+  }
+
   async selectADZureLogin() {
+    this.setSessionID();
    // if (JSON.parse(JSON.stringify(config.capabilities))[0].platformName === 'Android') {
      (await $(SELECTORS.LOGIN_VIA_AZURE_AD).waitForDisplayed()) &&
       (await $(SELECTORS.LOGIN_VIA_AZURE_AD).touchAction('tap'));

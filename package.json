@@ -8,6 +8,7 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
+    "cleanup": "rm -rf node_modules && yarn cache clean --force && watchman watch-del-all",
     "test:execute:ios": "cross-env wdio config/wdio.ios.app.conf.ts",
     "test:execute:android": "cross-env wdio config/wdio.android.app.conf.ts",
     "test:execute:ios:ipa": "wdio config/wdio.ios.app.bs.ts",
