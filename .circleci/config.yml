@@ -289,7 +289,7 @@ jobs:
 
       - mark-test-status
       - get-public-url
-      # - generate-report
+      - generate-report
 
       - run:
           name: Copy test results to S3
@@ -408,7 +408,7 @@ jobs:
 
       - mark-test-status
       - get-public-url
-      # - generate-report
+      - generate-report
 
 workflows:
   android-ios:
