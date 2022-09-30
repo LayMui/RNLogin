@@ -417,6 +417,7 @@ workflows:
           name: 'android build and test'
           context:
             - BROWSERSTACK_CREDENTIALS
+            - AWS_CREDENTIALS
           filters:
             branches:
               only:
@@ -427,6 +428,7 @@ workflows:
           name: 'ios build and test'
           context:
             - BROWSERSTACK_CREDENTIALS
+            - AWS_CREDENTIALS
           filters:
             branches:
               only:
