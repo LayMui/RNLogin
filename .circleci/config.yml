@@ -290,17 +290,17 @@ jobs:
 
       - mark-test-status
       - get-public-url
-      - generate-report
+      # - generate-report
 
-      - run:
-          name: Copy test results to S3
-          command: |
-            aws s3 cp reporter s3://serenitybdd.s3.website-ap.southeast-1.amazonaws.com --recursive --acl public-read-write
-          # setting always so this S3 copy is run whether tests failed or succeeded
-          when: always
+      # - run:
+      #     name: Copy test results to S3
+      #     command: |
+      #       aws s3 cp reporter s3://serenitybdd.s3.website-ap.southeast-1.amazonaws.com --recursive --acl public-read-write
+      #     # setting always so this S3 copy is run whether tests failed or succeeded
+      #     when: always
 
-      - <<: *slack-notify-failure
-      - <<: *slack-notify-success
+      # - <<: *slack-notify-failure
+      # - <<: *slack-notify-success
 
   android-build-and-test:
     working_directory: ~/RNLogin
