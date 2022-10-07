@@ -212,6 +212,7 @@ jobs:
 
     steps:
       - checkout
+      - aws-cli/setup
 
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
@@ -328,6 +329,7 @@ jobs:
 
     steps:
       - checkout
+      - aws-cli/setup
 
       - node/install:
           install-yarn: true
